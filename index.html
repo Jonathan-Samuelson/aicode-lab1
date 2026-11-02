@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>מפת הליכה – קמפוס אדמונד י' ספרא, גבעת רם</title>
+  <link rel="stylesheet" href="vendor/maplibre-gl/maplibre-gl.css">
+  <link rel="stylesheet" href="app/app.css">
+</head>
+<body>
+  <aside id="panel">
+    <header>
+      <h1>מפת הליכה – קמפוס גבעת רם</h1>
+      <p class="sub">קמפוס אדמונד י' ספרא, האוניברסיטה העברית בירושלים</p>
+    </header>
+
+    <section class="route-form">
+      <label>מוצא
+        <select id="sel-from"><option value="">בחרו נקודת מוצא</option></select>
+      </label>
+      <button id="btn-swap" title="החלפת מוצא ויעד" aria-label="החלפת מוצא ויעד">⇅</button>
+      <label>יעד
+        <select id="sel-to"><option value="">בחרו יעד</option></select>
+      </label>
+    </section>
+
+    <section class="opts">
+      <label class="lawn-opt"><input type="checkbox" id="chk-lawn"> אפשר קיצורי דרך דרך הדשא</label>
+      <p class="small" id="lawn-help">כבוי: מסלול בשבילים ממופים בלבד. מופעל: גם קווים ישרים בתוך שטחים ירוקים ממופים, בלי לחצות בניינים, גדרות, כבישים, מדרגות או שטחים מוגבלים. אלה קיצורים משוערים – יש לוודא בשטח.</p>
+    </section>
+
+    <section id="result" aria-live="polite"></section>
+
+    <section>
+      <h2>היעדים ומקור המיקום</h2>
+      <ul id="dest-info" class="small"></ul>
+    </section>
+
+    <section>
+      <h2>מקרא</h2>
+      <ul class="legend small">
+        <li><i class="ln net"></i> מסלול ברשת ההליכה הממופה (OSM)</li>
+        <li><i class="ln approx"></i> חיבור משוער בין קיר הבניין לשביל (כניסה לא ממופה)</li>
+        <li><i class="ln lawn"></i> קיצור דרך משוער בדשא — יש לוודא שניתן לעבור</li>
+        <li><i class="sw lawn"></i> שטח ירוק שנבדק לקיצורים (מוצג כשהאפשרות מופעלת)</li>
+        <li><i class="dot end"></i> נקודת קצה של הרשת הממופה</li>
+        <li><i class="sw dest"></i> בניין יעד</li>
+        <li><i class="sw cont"></i> בניין שבתוכו סומן מיקום היעד</li>
+        <li><i class="ln walk"></i> דרכים להולכי רגל ברשת</li>
+      </ul>
+      <label class="small"><input type="checkbox" id="tog-tiles" checked> רקע מפת OSM</label>
+      <label class="small"><input type="checkbox" id="tog-paths" checked> הצגת רשת ההליכה</label>
+      <button id="btn-3d">תצוגה דו-ממדית</button>
+    </section>
+
+    <section>
+      <h2>מגבלות הנתונים</h2>
+      <ul class="small">
+        <li><b>אין כניסות ממופות</b> לאף אחד משבעת היעדים. המסלול מתחיל ומסתיים בחיבור משוער מקיר הבניין לשביל הקרוב שאינו חוצה בניין או גדר ממופים. אין דיוק מדלת לדלת.</li>
+        <li>המסלול הוא הקצר ביותר <b>ברשת שנכללה בפרויקט בלבד</b> (OSM, 2026-11-02). ייתכנו שבילים קצרים יותר שאינם ממופים.</li>
+        <li>הוחרגו: כבישים מהירים, דרכים פרטיות או ללקוחות בלבד, כבישים שהמדרכה שלהם ממופה בנפרד, ושערים נעולים או סגורים להולכי רגל.</li>
+        <li>גדרות ממופות באופן חלקי מאוד. שעות פתיחה של שערים וכניסות אינן נבדקות.</li>
+        <li>אולם קנדה ואודיטוריום הנדסה: המיקום לפי סימון המשתמש במפת הבדיקה, ברמת הוודאות שנרשמה.</li>
+        <li>אולם קפלן ורוטברג: נקודה אחת משותפת ב-OSM; אין קואורדינטות נפרדות.</li>
+        <li><b>קיצורי דרך בדשא:</b> ב-OSM אין כאן שטחים המסומנים כדשא (landuse=grass). נעשה שימוש בשטחים ירוקים המסומנים "פארק" בתוך גבולות הקמפוס. לפי תצלומי אוויר אלה תערובת של דשא, עצים ומשטחים. הנתונים אינם מראים שיפועים, קירות תמך, ערוגות או גדרות שלא מופו – לכן כל קיצור מסומן כמשוער. מוצעים רק קיצורים שחוסכים לפחות 3 מ' לעומת השבילים.</li>
+        <li>בניין מנצ'סטר (מכון איינשטיין למתמטיקה): קווי מתאר ב-OSM; האתר של המכון אינו מציין היכן הכניסה הראשית, ולכן החיבור האחרון משוער.</li>
+        <li>גובהי הבניינים סכמטיים (לפי מספר קומות כשידוע, אחרת 9 מ').</li>
+      </ul>
+    </section>
+
+    <footer>
+      <h2>מקורות וייחוס</h2>
+      <ul id="sources" class="small"></ul>
+      <p class="small"><a href="review/">מפת בדיקת המיקומים</a></p>
+    </footer>
+  </aside>
+  <main id="map" dir="ltr"></main>
+
+  <script src="vendor/maplibre-gl/maplibre-gl.js"></script>
+  <script src="app/data/campus-data.js"></script>
+  <script src="app/route.js"></script>
+  <script src="app/app.js"></script>
+</body>
+</html>

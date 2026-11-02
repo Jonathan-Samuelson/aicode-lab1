@@ -1,0 +1,89 @@
+{
+  "schema": "givat-ram-location-review/1",
+  "base_data": "OSM snapshot 2026-11-02",
+  "destinations": {
+    "canada": {
+      "building": {
+        "confidence": "field",
+        "note": "",
+        "source": null,
+        "source_ref": null,
+        "shared_with": null,
+        "lat": 31.7781614,
+        "lon": 35.1977599,
+        "method": "map-click+drag",
+        "updated_at": "2026-11-02T13:46:14.186Z",
+        "moved_from_source": false
+      },
+      "entrances": [],
+      "note": "מיקום נקבע לפי היכרותי עם המקום. התייחס לזה כאל נתון אמיתי."
+    },
+    "engineering": {
+      "building": {
+        "confidence": "estimate",
+        "note": "",
+        "source": null,
+        "source_ref": null,
+        "shared_with": null,
+        "lat": 31.7762095,
+        "lon": 35.1977438,
+        "method": "map-click+drag",
+        "updated_at": "2026-11-02T13:47:59.079Z",
+        "moved_from_source": false
+      },
+      "entrances": [],
+      "note": "מיקום נקבע לפי היכרותי עם המקום. התייחס לזה כאל נתון אמיתי."
+    },
+    "sprinzak": {
+      "building": null,
+      "entrances": [],
+      "note": ""
+    },
+    "harman": {
+      "building": null,
+      "entrances": [],
+      "note": ""
+    },
+    "kaplan": {
+      "building": null,
+      "entrances": [],
+      "note": ""
+    },
+    "rothberg": {
+      "building": {
+        "confidence": "estimate",
+        "note": "",
+        "source": "https://www.openstreetmap.org/node/3705029048",
+        "source_ref": "node/3705029048",
+        "shared_with": [
+          "kaplan",
+          "rothberg"
+        ],
+        "lat": 31.7761078,
+        "lon": 35.196116,
+        "method": "candidate",
+        "updated_at": "2026-11-02T13:48:35.635Z",
+        "moved_from_source": false
+      },
+      "entrances": [],
+      "note": ""
+    }
+  },
+  "exported_at": "2026-11-02T13:51:27.346Z",
+  "destination_names": {
+    "canada": "אולם קנדה",
+    "engineering": "אודיטוריום הנדסה",
+    "sprinzak": "בניין שפרינצק",
+    "harman": "ספריית הרמן",
+    "kaplan": "אולם קפלן",
+    "rothberg": "רוטברג"
+  },
+  "entrance_connectors": {
+    "canada": [],
+    "engineering": [],
+    "sprinzak": [],
+    "harman": [],
+    "kaplan": [],
+    "rothberg": []
+  }
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>מפת בדיקת מיקומים – קמפוס אדמונד י' ספרא, גבעת רם</title>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="review.css">
+</head>
+<body>
+  <aside id="panel">
+    <header>
+      <h1>בדיקת מיקומים – גבעת רם</h1>
+      <p class="sub">כלי פנימי לאימות מיקומי בניינים וכניסות לפני בניית מפת הניווט. אינו מפת ניווט.</p>
+    </header>
+
+    <section>
+      <h2>יעדים</h2>
+      <ul id="dest-list"></ul>
+    </section>
+
+    <section id="dest-detail" hidden>
+      <h2 id="dd-name"></h2>
+      <p id="dd-status" class="status"></p>
+      <p id="dd-summary"></p>
+      <h3>ראיות ומקורות</h3>
+      <ul id="dd-evidence" class="links"></ul>
+      <h3>מועמדים שנמצאו</h3>
+      <ul id="dd-candidates"></ul>
+
+      <h3>התיקונים שלך</h3>
+      <div class="mode">
+        <span>לחיצה על המפה תקבע:</span>
+        <label><input type="radio" name="mode" value="none" checked> כלום</label>
+        <label><input type="radio" name="mode" value="building"> מיקום הבניין</label>
+        <label><input type="radio" name="mode" value="entrance"> כניסה להולכי רגל (הוספה)</label>
+      </div>
+      <div id="dd-building"></div>
+      <div id="dd-entrances"></div>
+      <label class="block">הערה כללית ליעד
+        <textarea id="dd-note" rows="2"></textarea>
+      </label>
+    </section>
+
+    <section>
+      <h2>שמירה וייצוא</h2>
+      <p class="small">התיקונים נשמרים אוטומטית בדפדפן זה (localStorage). לשימוש באפליקציה הסופית – ייצא לקובץ JSON.</p>
+      <div class="buttons">
+        <button id="btn-export">ייצוא JSON</button>
+        <label class="button">ייבוא JSON<input type="file" id="file-import" accept=".json,application/json" hidden></label>
+        <button id="btn-reset" class="danger">מחיקת כל התיקונים</button>
+      </div>
+      <p id="save-state" class="small"></p>
+    </section>
+
+    <section>
+      <h2>מקרא</h2>
+      <ul class="legend">
+        <li><i class="sw b-verified"></i> בניין יעד מאומת ב-OSM</li>
+        <li><i class="sw b-cand"></i> בניין מועמד (לא מאומת)</li>
+        <li><i class="sw b-other"></i> בניין אחר ב-OSM</li>
+        <li><i class="ln walk"></i> דרך שמותרת להולכי רגל לפי התגים</li>
+        <li><i class="ln restricted"></i> גישה מוגבלת (private / customers)</li>
+        <li><i class="ln excluded"></i> מוחרג (כלי רכב בלבד / בבנייה)</li>
+        <li><i class="ln barrier"></i> גדר / חומה ממופה</li>
+        <li><i class="dot shared"></i> נקודה משותפת (קפלן + רוטברג)</li>
+        <li><i class="dot bldg"></i> מיקום בניין שקבעת</li>
+        <li><i class="dot ent"></i> כניסה שקבעת</li>
+        <li><i class="ln approx"></i> חיבור משוער לרשת ההליכה</li>
+      </ul>
+      <label><input type="checkbox" id="tog-tiles" checked> רקע אריחי OSM</label>
+    </section>
+
+    <section>
+      <h2>מגבלות ידועות</h2>
+      <ul class="small">
+        <li>אין כניסות בניינים ממופות ב-OSM ביעדים אלה. כל כניסה כאן היא תיקון ידני שלך.</li>
+        <li>גדרות וחומות ממופות באופן חלקי מאוד ב-OSM. היעדר גדר במפה אינו הוכחה שאין גדר.</li>
+        <li>החיבור המשוער הוא קו ישר מהכניסה לנקודה הקרובה ביותר בדרך הולכי רגל. הוא נבדק רק מול בניינים וגדרות ממופים.</li>
+        <li>אולם קנדה ואודיטוריום הנדסה לא זוהו. המועמדים מוצגים לעיון בלבד.</li>
+      </ul>
+    </section>
+
+    <footer>
+      <h2>מקורות וייחוס</h2>
+      <ul id="sources" class="links small"></ul>
+    </footer>
+  </aside>
+  <main id="map" dir="ltr"></main>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="data/review-data.js"></script>
+  <script src="review.js"></script>
+</body>
+</html>
