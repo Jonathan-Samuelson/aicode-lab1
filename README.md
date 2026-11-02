@@ -2,7 +2,7 @@
 
 A static, browser-only 3D walking map of the Hebrew University's Givat Ram campus, with seven
 destinations, shortest-path routing on the bundled pedestrian network, and Hebrew walking directions.
-No backend, no API keys. Deployable to GitHub Pages as is (not published yet).
+No backend, no API keys, no build step. Published on GitHub Pages: <https://jonathan-samuelson.github.io/aicode-lab1/>.
 
 ## Open it
 
@@ -14,8 +14,8 @@ python3 -m http.server 8000
 - App: <http://localhost:8000/>
 - Location-review map: <http://localhost:8000/review/>
 
-Use the local server rather than opening `index.html` directly, because the OSM tile servers may
-refuse requests that carry no referrer. Without tiles the 3D buildings, paths and routes still work.
+Use a local server rather than opening `index.html` directly: the 3D renderer is an ES module, and
+browsers don't load modules from `file://`. Add `&fx=low` to the URL to start in reduced-effects mode.
 You can link straight to a route: `http://localhost:8000/#from=harman&to=engineering`
 (ids: `canada`, `engineering`, `sprinzak`, `harman`, `kaplan`, `rothberg`, `manchester`).
 Add `&lawn=1` to turn on lawn shortcuts: `http://localhost:8000/#from=harman&to=engineering&lawn=1`.
@@ -24,8 +24,9 @@ Add `&lawn=1` to turn on lawn shortcuts: `http://localhost:8000/#from=harman&to=
 
 1. The app opens with the route **בניין שפרינצק → אולם קנדה**: about 226 m, made of 217 m on the
    mapped network plus 9 m of dashed approximate connection.
-2. Drag the map to pan, scroll to zoom, and right-drag (or Ctrl+drag) to rotate and tilt.
-   "תצוגה דו-ממדית" flattens the view.
+2. Drag to pan, scroll to zoom (towards the cursor), and right-drag (or Ctrl+drag) to orbit and tilt.
+   On touch screens: one finger pans, two fingers zoom and rotate. The toolbar at the top left has zoom,
+   rotate, tilt and top-view buttons, plus **"איפוס תצוגה"** to return to the opening view.
 3. Press **⇅** to swap the start and destination. The route and directions update.
 4. Pick **ספריית הרמן → אודיטוריום הנדסה**. The route detours via שדרות מאגנס because OSM has
    no direct path mapped there (see limitations).
@@ -36,6 +37,41 @@ Add `&lawn=1` to turn on lawn shortcuts: `http://localhost:8000/#from=harman&to=
    לעבור" crosses the grass strip next to שדרות מאגנס, and the directions include a green step for it.
 8. Pick **בניין שפרינצק → בניין מנצ'סטר — מתמטיקה** in both modes: about 456 m on paths, about 440 m with a
    66 m lawn stretch. Swap to check the reverse direction.
+
+## 3D view
+
+- **Renderer:** three.js 0.170 (`vendor/three/`, MIT), loaded through an import map. There's no build step.
+  `app/scene3d.js` only draws. It reads the routing data and `app/data/scenery-data.js` and never changes
+  either, and the routes it draws come from `app/route.js`.
+- **What is mapped:**
+  - Building footprints are the same outlines the router uses.
+  - Grass, forest, parking, plazas, pitches, water and construction areas are OSM areas.
+  - Roads, paths, steps, the light rail, the one mapped fence, and 2 OSM tree nodes are also from OSM.
+  - Scenery data is built by `tools/build_scenery_data.py`.
+- **What is illustrative:**
+  - Building heights: 8 of the 180 buildings shown have a mapped height or floor count. The rest are
+    9 m. Clicking a building shows where its height comes from.
+  - Stone walls, window patterns (one bay about every 3.2 m, one row per floor), roof parapets,
+    stepped tile roofs (on buildings OSM tags with tile or hipped roofs), road widths, and colours.
+  - 1,021 decorative voxel trees, placed on a 7 m grid only inside OSM forest/wood areas and kept off
+    buildings, roads and paths. The legend gives both tree counts. The tree toggle under "תצוגה וביצועים"
+    hides the decorative ones.
+  - The ground is flat: there is no elevation data.
+- **Lighting:**
+  - Warm afternoon sun from the west-south-west with soft shadows, a sky light, and darkened wall bases.
+  - Light distance fog and a gradient sky. Tone mapping is ACES.
+  - No bloom and no animation.
+- **Reduced-effects mode** ("מצב חסכוני"): no shadows, pixel ratio 1, and fewer decorative trees.
+  It turns on automatically when the browser reports 4 or fewer CPU cores or 4 GB or less of memory.
+  The choice is saved in the browser, and `#fx=low` / `#fx=high` overrides it.
+- **Routes:**
+  - Drawn just above the ground on a white casing. Mapped paths are solid blue, lawn shortcuts are
+    green dashes, and approximate building connections are orange dashes.
+  - A faint copy shows through buildings that hide the route.
+- **Labels:**
+  - HTML labels, placed so they don't overlap.
+  - Destination and uncertainty labels (confidence lines and the lawn-shortcut label) are never hidden,
+    only moved. Building-name labels are hidden when they would overlap or when zoomed out.
 
 ## How routing works
 
@@ -116,19 +152,22 @@ are used as connection points instead of the building outline.
 ```bash
 python3 -I tests/test_app_data.py   # data rules, corrections, Manchester, lawn checks, reference paths (both modes)
 node tests/routing.test.js          # JS router vs reference in both modes, lawn rules, Manchester, no-route
+python3 -I tests/test_scenery_data.py  # scenery is separate from routing and drawn from mapped data
 node review/tests/data-and-geometry.test.js
 node review/tests/obstacles-and-export.test.js
 ```
 
 ## Files
 
-- `index.html`, `app/app.js`, `app/app.css`: the 3D app (MapLibre GL JS).
+- `index.html`, `app/app.js`, `app/app.css`: the app page and panel.
+- `app/scene3d.js`: the 3D renderer (three.js). It draws only.
+- `app/data/scenery-data.js`: visual-only OSM scenery, generated by `tools/build_scenery_data.py`.
 - `app/route.js`: routing and Hebrew directions (no map code).
 - `app/data/campus-data.js`: generated by `tools/build_app_data.py`.
 - `data/raw/osm_givat_ram_2026-11-02.json`: OSM API snapshot (bbox 35.1880,31.7690,35.2060,31.7800).
 - `data/corrections/`: your exported corrections.
 - `review/`: the location-review map (Leaflet).
-- `vendor/`: MapLibre GL JS 4.7.1 (BSD-3-Clause). Leaflet 1.9.4 is in `review/vendor/`.
+- `vendor/three/`: three.js 0.170.0 core and MapControls (MIT). Leaflet 1.9.4 is in `review/vendor/`.
 
 ## Sources and attribution
 
@@ -142,4 +181,4 @@ node review/tests/obstacles-and-export.test.js
   the Plant Evolution Garden.
 - Location corrections: supplied by the project owner through the review map
   (`data/corrections/`, exported 2026-11-02).
-- [MapLibre GL JS](https://maplibre.org), [Leaflet](https://leafletjs.com).
+- [three.js](https://threejs.org) (MIT), [Leaflet](https://leafletjs.com) (BSD-2-Clause).
